@@ -283,6 +283,7 @@
     <string name="color_adjustment">Color Adjustment</string>
     <string name="reset">Reset</string>
     <string name="enable_crt_shader">Enable CRT Shader</string>
+    <string name="enable_sharpen">Enable Sharpen (AMD FSR RCAS)</string>
     <string name="open_directory">Open Directory</string>
     <string name="locations">Locations</string>
     <string name="downloads">Downloads</string>
