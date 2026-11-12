@@ -18,6 +18,7 @@ import com.winlator.renderer.GLRenderer;
 import com.winlator.renderer.effects.CRTEffect;
 import com.winlator.renderer.effects.ColorEffect;
 import com.winlator.renderer.effects.FXAAEffect;
+import com.winlator.renderer.effects.SharpenEffect;
 import com.winlator.widget.SeekBar;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class ScreenEffectDialog extends ContentDialog {
     private final SeekBar sbGamma;
     private final CheckBox cbEnableFXAA;
     private final CheckBox cbEnableCRTShader;
+    private final CheckBox cbEnableSharpen;
 
     public ScreenEffectDialog(XServerDisplayActivity activity) {
         super(activity, R.layout.screen_effect_dialog);
@@ -46,6 +48,7 @@ public class ScreenEffectDialog extends ContentDialog {
         final ColorEffect colorEffect = currentColorEffect != null ? currentColorEffect : new ColorEffect();
         final FXAAEffect fxaaEffect = renderer.effectComposer.getEffect(FXAAEffect.class);
         final CRTEffect crtEffect = renderer.effectComposer.getEffect(CRTEffect.class);
+        final SharpenEffect sharpenEffect = renderer.effectComposer.getEffect(SharpenEffect.class);
 
         sProfile = findViewById(R.id.SProfile);
         sbBrightness = findViewById(R.id.SBBrightness);
@@ -53,12 +56,14 @@ public class ScreenEffectDialog extends ContentDialog {
         sbGamma = findViewById(R.id.SBGamma);
         cbEnableFXAA = findViewById(R.id.CBEnableFXAA);
         cbEnableCRTShader = findViewById(R.id.CBEnableCRTShader);
+        cbEnableSharpen = findViewById(R.id.CBEnableSharpen);
 
         sbBrightness.setValue(colorEffect.getBrightness() * 100);
         sbContrast.setValue(colorEffect.getContrast() * 100);
         sbGamma.setValue(colorEffect.getGamma());
         cbEnableFXAA.setChecked(fxaaEffect != null);
         cbEnableCRTShader.setChecked(crtEffect != null);
+        cbEnableSharpen.setChecked(sharpenEffect != null);
 
         sProfile.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -110,6 +115,14 @@ public class ScreenEffectDialog extends ContentDialog {
             }
             else if (crtEffect != null) renderer.effectComposer.removeEffect(crtEffect);
 
+            if (cbEnableSharpen.isChecked()) {
+                // Re-added last so sharpening always runs after anti-aliasing and the other effects.
+                SharpenEffect effect = sharpenEffect != null ? sharpenEffect : new SharpenEffect();
+                renderer.effectComposer.removeEffect(effect);
+                renderer.effectComposer.addEffect(effect);
+            }
+            else if (sharpenEffect != null) renderer.effectComposer.removeEffect(sharpenEffect);
+
             saveProfile(sProfile);
         });
 
@@ -125,6 +138,7 @@ public class ScreenEffectDialog extends ContentDialog {
 
         cbEnableFXAA.setChecked(false);
         cbEnableCRTShader.setChecked(false);
+        cbEnableSharpen.setChecked(false);
     }
 
     private void saveProfile(Spinner sProfile) {
@@ -139,6 +153,7 @@ public class ScreenEffectDialog extends ContentDialog {
             settings.put("gamma", sbGamma.getValue());
             settings.put("fxaa", cbEnableFXAA.isChecked());
             settings.put("crt_shader", cbEnableCRTShader.isChecked());
+            settings.put("sharpen", cbEnableSharpen.isChecked());
 
             for (String profile : oldProfiles) {
                 String name = profile.split(":")[0];
@@ -164,6 +179,7 @@ public class ScreenEffectDialog extends ContentDialog {
                     sbGamma.setValue(settings.getFloat("gamma", 1.0f));
                     cbEnableFXAA.setChecked(settings.getBoolean("fxaa", false));
                     cbEnableCRTShader.setChecked(settings.getBoolean("crt_shader", false));
+                    cbEnableSharpen.setChecked(settings.getBoolean("sharpen", false));
                 }
                 break;
             }
