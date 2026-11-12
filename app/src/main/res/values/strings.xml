@@ -358,4 +358,6 @@
     <string name="fgs_notification_content_else">Winlator is running in the background</string>
     <string name="save_mem_on_run_from_steam">Save memory on run from Steam</string>
     <string name="present_mode">Present Mode</string>
+    <string name="container_preset">Preset</string>
+    <string name="preset_custom">Custom (manual)</string>
 </resources>
