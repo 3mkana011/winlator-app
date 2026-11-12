@@ -1,0 +1,30 @@
+{
+  "presets": [
+    {
+      "name": "Performance",
+      "description": "Fastest Box64 settings. Best for most modern games (the app default).",
+      "box64Preset": "PERFORMANCE"
+    },
+    {
+      "name": "Balanced",
+      "description": "A middle ground between speed and stability.",
+      "box64Preset": "INTERMEDIATE"
+    },
+    {
+      "name": "Stability",
+      "description": "Use this if a game crashes or behaves unpredictably.",
+      "box64Preset": "STABILITY"
+    },
+    {
+      "name": "Unity games",
+      "description": "Safer Box64 settings for games made with the Unity engine.",
+      "box64Preset": "STABILITY"
+    },
+    {
+      "name": "Older games (2003 and earlier)",
+      "description": "For older games that don't open. Limits OpenGL extensions to those from 2003 or earlier.",
+      "box64Preset": "PERFORMANCE",
+      "envVars": "MESA_EXTENSION_MAX_YEAR=2003"
+    }
+  ]
+}

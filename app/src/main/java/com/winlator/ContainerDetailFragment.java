@@ -63,6 +63,7 @@ import com.winlator.widget.SeekBar;
 import com.winlator.win32.MSLogFont;
 import com.winlator.win32.WinVersions;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -174,6 +175,7 @@ public class ContainerDetailFragment extends Fragment {
 
         createWineConfigurationTab(view);
         final EnvVarsView envVarsView = createEnvVarsTab(view);
+        if (!isEditMode()) setupPresets(view, sBox64Preset, envVarsView);
         createWinComponentsTab(view, isEditMode() ? container.getWinComponents() : Container.DEFAULT_WINCOMPONENTS);
         createDrivesTab(view);
 
@@ -431,6 +433,60 @@ public class ContainerDetailFragment extends Fragment {
             spinner.setTag(name);
             parent.addView(itemView);
         }
+    }
+
+    private static JSONArray loadPresets(Context context) {
+        try {
+            return new JSONObject(FileUtils.readString(context, "container_presets.json")).getJSONArray("presets");
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    // Shows a "Preset" dropdown on the New Container screen. Choosing a preset fills in the
+    // Box64 preset and environment variables. The list lives in assets/container_presets.json.
+    private void setupPresets(View view, final Spinner sBox64Preset, final EnvVarsView envVarsView) {
+        final Context context = view.getContext();
+        final JSONArray presets = loadPresets(context);
+        if (presets == null || presets.length() == 0) return;
+
+        final ArrayList<String> names = new ArrayList<>();
+        names.add(context.getString(R.string.preset_custom));
+        for (int i = 0; i < presets.length(); i++) {
+            JSONObject preset = presets.optJSONObject(i);
+            String fallbackName = "Preset "+(i + 1);
+            names.add(preset != null ? preset.optString("name", fallbackName) : fallbackName);
+        }
+
+        final Spinner sPreset = view.findViewById(R.id.SPreset);
+        final TextView tvPresetDescription = view.findViewById(R.id.TVPresetDescription);
+        sPreset.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, names));
+        view.findViewById(R.id.LLPreset).setVisibility(View.VISIBLE);
+
+        sPreset.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View itemView, int position, long id) {
+                JSONObject preset = position > 0 ? presets.optJSONObject(position - 1) : null;
+                if (preset == null) {
+                    tvPresetDescription.setVisibility(View.GONE);
+                    return;
+                }
+
+                String description = preset.optString("description", "");
+                tvPresetDescription.setText(description);
+                tvPresetDescription.setVisibility(description.isEmpty() ? View.GONE : View.VISIBLE);
+
+                Box64PresetManager.loadSpinner(sBox64Preset, preset.optString("box64Preset", Box64Preset.DEFAULT));
+
+                EnvVars envVars = new EnvVars(Container.DEFAULT_ENV_VARS);
+                envVars.putAll(preset.optString("envVars", ""));
+                envVarsView.setEnvVars(envVars);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
     }
 
     private EnvVarsView createEnvVarsTab(final View view) {

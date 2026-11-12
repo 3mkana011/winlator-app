@@ -25,6 +25,30 @@
                 android:inputType="textCapSentences" />
 
             <LinearLayout
+                android:id="@+id/LLPreset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/container_preset" />
+
+                <Spinner
+                    style="@style/ComboBox"
+                    android:layout_width="match_parent"
+                    android:id="@+id/SPreset" />
+
+                <TextView
+                    android:id="@+id/TVPresetDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
